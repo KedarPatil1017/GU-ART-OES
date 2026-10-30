@@ -32,3 +32,8 @@ GitHub Pages serves over HTTPS, which is required for service workers and PWA in
 - `manifest.webmanifest` — PWA name, display mode, colours, and icons
 - `sw.js` — offline app-shell cache
 - `icons/` — install icons
+
+
+## Project-site path configuration
+
+This build is configured specifically for `https://kedarpatil1017.github.io/GU-ART-OES/` using absolute manifest, icon, and service-worker paths.

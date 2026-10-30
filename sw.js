@@ -1,11 +1,12 @@
-const CACHE_NAME = 'gu-art-mock-exam-v1';
+const CACHE_NAME = 'gu-art-mock-exam-v2';
+const APP_BASE = '/GU-ART-OES/';
 const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-512-maskable.png'
+  APP_BASE,
+  APP_BASE + 'index.html',
+  APP_BASE + 'manifest.webmanifest',
+  APP_BASE + 'icons/icon-192.png',
+  APP_BASE + 'icons/icon-512.png',
+  APP_BASE + 'icons/icon-512-maskable.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -20,7 +21,8 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.filter((key) => key.startsWith('gu-art-mock-exam-') && key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
@@ -31,9 +33,8 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || !url.pathname.startsWith(APP_BASE)) return;
 
-  // App shell: serve cached files first so the installed app opens offline.
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
@@ -44,7 +45,7 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       }).catch(() => {
-        if (request.mode === 'navigate') return caches.match('./index.html');
+        if (request.mode === 'navigate') return caches.match(APP_BASE + 'index.html');
         throw new Error('Offline and resource not cached');
       });
     })
